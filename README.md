@@ -8,6 +8,12 @@
 
 [Open the synthetic ICA Usage Dashboard](https://wf4006hufman.github.io/ICA_usage_dashboard_showcase/)
 
+## Dashboard preview
+
+[![Synthetic ICA Usage Dashboard preview](assets/dashboard-preview.png)](https://wf4006hufman.github.io/ICA_usage_dashboard_showcase/)
+
+Select the preview to open the interactive dashboard.
+
 ## Why this exists
 
 Looking up ICA credit usage one analysis at a time requires repetitive CLI and
