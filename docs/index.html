@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <meta name="color-scheme" content="dark">
+  <title>ICA Usage Dashboard · DEMO-PROJECT</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #050b14;
+      --ink-raised: #091522;
+      --panel: rgba(10, 27, 42, .84);
+      --panel-solid: #0b1a29;
+      --line: rgba(125, 179, 202, .22);
+      --line-strong: rgba(70, 226, 239, .52);
+      --text: #eef8f7;
+      --muted: #93aeb8;
+      --cyan: #46e2ef;
+      --cyan-dim: #16899b;
+      --lime: #c9ff54;
+      --amber: #ffc45c;
+      --red: #ff7d7d;
+      --radius: 3px;
+      --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      --condensed: "Avenir Next Condensed", "DIN Condensed",
+        "Helvetica Neue Condensed", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--ink);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.5;
+      background:
+        linear-gradient(rgba(70, 226, 239, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(70, 226, 239, .025) 1px, transparent 1px),
+        radial-gradient(circle at 88% 5%, rgba(22, 137, 155, .2), transparent 30rem),
+        radial-gradient(circle at 3% 58%, rgba(201, 255, 84, .055), transparent 26rem),
+        var(--ink);
+      background-size: 38px 38px, 38px 38px, auto, auto, auto;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      opacity: .13;
+      background-image:
+        repeating-linear-gradient(
+          115deg,
+          transparent 0 5px,
+          rgba(255, 255, 255, .035) 6px,
+          transparent 7px
+        );
+      mix-blend-mode: screen;
+    }
+
+    a {
+      color: var(--cyan);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--lime);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(1540px, 100%);
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 3vw, 3rem) 3.5rem;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 2rem;
+      align-items: end;
+      min-height: 15rem;
+      padding: 4rem 0 2.3rem;
+      border-bottom: 1px solid var(--line-strong);
+      animation: enter .55s ease-out both;
+    }
+
+    .kicker,
+    .section-code,
+    .metric__eyebrow,
+    .meta__label {
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    .kicker {
+      display: flex;
+      gap: .7rem;
+      align-items: center;
+      margin: 0 0 .85rem;
+    }
+
+    .kicker::before {
+      width: 2.6rem;
+      height: 2px;
+      content: "";
+      background: var(--lime);
+      box-shadow: 0 0 18px rgba(201, 255, 84, .5);
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 15ch;
+      margin-bottom: 0;
+      font-family: var(--condensed);
+      font-size: clamp(3rem, 8.2vw, 7.2rem);
+      font-weight: 800;
+      line-height: .82;
+      letter-spacing: -.055em;
+      text-transform: uppercase;
+    }
+
+    h1 span {
+      color: transparent;
+      -webkit-text-stroke: 1px var(--cyan);
+      text-shadow: 0 0 26px rgba(70, 226, 239, .18);
+    }
+
+    .meta {
+      display: grid;
+      gap: 1rem;
+      min-width: min(100%, 18rem);
+      margin: 0;
+      padding: 1.25rem 0 1.25rem 1.4rem;
+      border-left: 1px solid var(--line);
+    }
+
+    .meta div {
+      display: grid;
+      gap: .2rem;
+    }
+
+    .meta dt,
+    .meta dd {
+      margin: 0;
+    }
+
+    .meta dd {
+      overflow-wrap: anywhere;
+      font-family: var(--mono);
+      font-size: .82rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(8rem, 1fr)) minmax(12rem, 1.5fr);
+      margin: 0 0 4rem;
+      border-bottom: 1px solid var(--line);
+      animation: enter .55s .08s ease-out both;
+    }
+
+    .metric {
+      position: relative;
+      display: flex;
+      min-height: 9.3rem;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.4rem 1.2rem 1.2rem 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .metric:not(:first-child) {
+      padding-left: 1.2rem;
+    }
+
+    .metric::before {
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 1.5rem;
+      height: 1px;
+      content: "";
+      background: var(--cyan);
+    }
+
+    .metric__value {
+      display: block;
+      margin: .55rem 0 -.1rem;
+      font-family: var(--condensed);
+      font-size: clamp(2.3rem, 4vw, 4.2rem);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+
+    .metric__label {
+      color: var(--muted);
+      font-size: .76rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .metric--total {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .metric--total .metric__value {
+      color: var(--lime);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 1rem;
+      align-items: baseline;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-family: var(--condensed);
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      line-height: 1;
+      letter-spacing: -.025em;
+      text-transform: uppercase;
+    }
+
+    .section-heading::after {
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, var(--line-strong), transparent);
+    }
+
+    .instrument {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
+      gap: clamp(1.25rem, 3vw, 3rem);
+      margin-bottom: 4.5rem;
+      animation: enter .55s .16s ease-out both;
+    }
+
+    .chart-panel {
+      min-height: 24rem;
+      padding: clamp(1.1rem, 2.5vw, 2rem);
+      border: 1px solid var(--line);
+      border-top-color: var(--line-strong);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(13, 36, 53, .92), rgba(6, 16, 27, .8));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+    }
+
+    .chart-group__heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: baseline;
+      padding-bottom: .55rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chart-group__currency,
+    .chart-group__scale {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .chart-group__currency {
+      color: var(--cyan);
+    }
+
+    .chart-group__scale {
+      color: var(--muted);
+    }
+
+    .usage-chart {
+      display: grid;
+      gap: 1.6rem;
+      min-height: 15rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .chart-group {
+      display: grid;
+      gap: .9rem;
+      padding-bottom: 1.35rem;
+      border-bottom: 1px dotted var(--line);
+    }
+
+    .chart-group:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .chart-group__rows {
+      display: grid;
+      gap: .9rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: minmax(7rem, 13rem) minmax(7rem, 1fr) auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .chart-label,
+    .chart-value {
+      overflow: hidden;
+      font-family: var(--mono);
+      font-size: .72rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chart-value {
+      min-width: 5rem;
+      color: var(--lime);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bar-track {
+      height: .7rem;
+      overflow: hidden;
+      border: 1px solid rgba(70, 226, 239, .22);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(70, 226, 239, .055) 0 1px,
+          transparent 1px 10%
+        );
+    }
+
+    .bar {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan-dim), var(--cyan), var(--lime));
+      box-shadow: 0 0 18px rgba(70, 226, 239, .32);
+      transform-origin: left;
+      animation: calibrate .7s .3s cubic-bezier(.2, .75, .25, 1) both;
+    }
+
+    .empty-state {
+      align-self: center;
+      margin: auto;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .8rem;
+      text-align: center;
+    }
+
+    .status-rail {
+      padding: 1.4rem;
+      border-left: 1px solid var(--line-strong);
+      background: rgba(9, 21, 34, .72);
+    }
+
+    .status-rail h3 {
+      margin: 0 0 1rem;
+      font-family: var(--condensed);
+      font-size: 1.2rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .status-list {
+      display: grid;
+      gap: .75rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .status-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: .65rem;
+      border-bottom: 1px dotted var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .74rem;
+    }
+
+    .status-list strong {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .signal {
+      display: inline-flex;
+      gap: .45rem;
+      align-items: center;
+    }
+
+    .signal::before {
+      width: .45rem;
+      height: .45rem;
+      border-radius: 50%;
+      content: "";
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .signal--available {
+      color: var(--lime);
+    }
+
+    .signal--processing {
+      color: var(--amber);
+    }
+
+    .signal--unavailable {
+      color: var(--red);
+    }
+
+    .note {
+      margin: 2rem 0 0;
+      padding-left: 1rem;
+      border-left: 2px solid var(--lime);
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .ledger {
+      animation: enter .55s .24s ease-out both;
+    }
+
+    .ledger-tools {
+      display: flex;
+      gap: 1rem;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .search-control {
+      display: grid;
+      width: min(100%, 31rem);
+      gap: .4rem;
+    }
+
+    .search-control label,
+    .row-count {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .search-control input {
+      width: 100%;
+      min-height: 2.8rem;
+      padding: .65rem .85rem;
+      border: 1px solid var(--line);
+      border-bottom-color: var(--cyan-dim);
+      border-radius: 0;
+      color: var(--text);
+      background: rgba(6, 16, 27, .86);
+      caret-color: var(--lime);
+    }
+
+    .search-control input::placeholder {
+      color: #6f8993;
+    }
+
+    .table-frame {
+      max-height: 42rem;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-top-color: var(--line-strong);
+      background: rgba(5, 11, 20, .82);
+      scrollbar-color: var(--cyan-dim) var(--ink);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .76rem;
+      white-space: nowrap;
+    }
+
+    caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line-strong);
+      background: var(--panel-solid);
+      text-align: left;
+    }
+
+    th button {
+      display: flex;
+      width: 100%;
+      gap: .6rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: .8rem .75rem;
+      border: 0;
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: .63rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-align: left;
+      text-transform: uppercase;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    th button::after {
+      color: var(--muted);
+      content: "↕";
+    }
+
+    th[aria-sort="ascending"] button::after {
+      color: var(--lime);
+      content: "↑";
+    }
+
+    th[aria-sort="descending"] button::after {
+      color: var(--lime);
+      content: "↓";
+    }
+
+    td {
+      max-width: 24rem;
+      overflow: hidden;
+      padding: .68rem .75rem;
+      border-right: 1px solid rgba(125, 179, 202, .11);
+      border-bottom: 1px solid rgba(125, 179, 202, .13);
+      color: #c9d9dd;
+      text-overflow: ellipsis;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(70, 226, 239, .018);
+    }
+
+    tbody tr:hover {
+      background: rgba(70, 226, 239, .065);
+    }
+
+    td[data-column="credit_amount"] {
+      color: var(--lime);
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.4rem;
+      padding: .12rem .5rem;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .status-available,
+    .status-succeeded {
+      color: var(--lime);
+      background: rgba(201, 255, 84, .055);
+    }
+
+    .status-processing,
+    .status-running {
+      color: var(--amber);
+      background: rgba(255, 196, 92, .055);
+    }
+
+    .status-not-ready,
+    .status-error,
+    .status-failed,
+    .status-metadata-error {
+      color: var(--red);
+      background: rgba(255, 125, 125, .055);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .64rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+    }
+
+    @keyframes calibrate {
+      from {
+        transform: scaleX(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .summary {
+        grid-template-columns: repeat(2, minmax(9rem, 1fr));
+      }
+
+      .metric {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .instrument {
+        grid-template-columns: 1fr;
+      }
+
+      .status-rail {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 660px) {
+      .shell {
+        padding-inline: 1rem;
+      }
+
+      .masthead {
+        grid-template-columns: 1fr;
+        min-height: 0;
+        padding-top: 2.5rem;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 18vw, 5.4rem);
+      }
+
+      .meta {
+        padding-left: 0;
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      .summary {
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 3rem;
+      }
+
+      .metric {
+        min-height: 7.8rem;
+      }
+
+      .metric:nth-child(odd) {
+        padding-left: 0;
+      }
+
+      .chart-row {
+        grid-template-columns: minmax(5.5rem, 1fr) minmax(6rem, 2fr);
+        gap: .6rem;
+      }
+
+      .chart-value {
+        grid-column: 2;
+      }
+
+      .ledger-tools,
+      .footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="kicker">Synthetic demo data · no live ICA connection</p>
+        <h1>ICA Usage <span>Dashboard</span></h1>
+      </div>
+      <dl class="meta" aria-label="Dashboard metadata">
+        <div>
+          <dt class="meta__label">Project</dt>
+          <dd>DEMO-PROJECT</dd>
+        </div>
+        <div>
+          <dt class="meta__label">Generated</dt>
+          <dd>2026-07-29 03:04:05 UTC</dd>
+        </div>
+      </dl>
+    </header>
+
+    <section class="summary" aria-label="Usage summary">
+      <article class="metric">
+        <span class="metric__eyebrow">Selection</span>
+        <strong class="metric__value">5</strong>
+        <span class="metric__label">Selected analyses</span>
+      </article>
+      <article class="metric">
+        <span class="metric__eyebrow">Signal ready</span>
+        <strong class="metric__value">3</strong>
+        <span class="metric__label">Usage available</span>
+      </article>
+      <article class="metric">
+        <span class="metric__eyebrow">In flight</span>
+        <strong class="metric__value">1</strong>
+        <span class="metric__label">Processing</span>
+      </article>
+      <article class="metric">
+        <span class="metric__eyebrow">No signal</span>
+        <strong class="metric__value">1</strong>
+        <span class="metric__label">Unavailable</span>
+      </article>
+      <article class="metric metric--total"><span class="metric__eyebrow">Usage ledger</span><strong class="metric__value">48.50</strong><span class="metric__label">Total iCredit</span></article>
+    </section>
+
+    <section aria-labelledby="usage-chart-heading">
+      <div class="section-heading">
+        <span class="section-code">01 / Signal profile</span>
+        <h2 id="usage-chart-heading">Analysis consumption</h2>
+      </div>
+      <div class="instrument">
+        <div class="chart-panel">
+          <ol
+            id="usage-chart"
+            class="usage-chart"
+            aria-label="Credit usage by analysis, grouped by currency"
+          ></ol>
+        </div>
+        <aside class="status-rail" aria-labelledby="status-heading">
+          <h3 id="status-heading">Acquisition state</h3>
+          <ul class="status-list">
+            <li>
+              <span class="signal signal--available">Available</span>
+              <strong>3</strong>
+            </li>
+            <li>
+              <span class="signal signal--processing">Processing</span>
+              <strong>1</strong>
+            </li>
+            <li>
+              <span class="signal signal--unavailable">Unavailable</span>
+              <strong>1</strong>
+            </li>
+          </ul>
+          <p class="note">
+            Analysis price excludes ongoing data storage costs.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="ledger" aria-labelledby="usage-table-heading">
+      <div class="section-heading">
+        <span class="section-code">02 / Source ledger</span>
+        <h2 id="usage-table-heading">Analysis records</h2>
+      </div>
+      <div class="ledger-tools">
+        <div class="search-control">
+          <label for="usage-search">Filter analysis records</label>
+          <input
+            id="usage-search"
+            type="search"
+            placeholder="Reference, sample, pipeline, status…"
+            autocomplete="off"
+          >
+        </div>
+        <output id="row-count" class="row-count" aria-live="polite"></output>
+      </div>
+      <div class="table-frame" tabindex="0" aria-label="Scrollable usage records">
+        <table id="usage-table">
+          <caption>
+            ICA analysis usage. Use column buttons to sort the records.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none"><button type="button" data-key="analysis_reference">Reference</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="user_reference">User reference</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="analysis_id">Analysis ID</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="analysis_status">Analysis status</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="pipeline">Pipeline</button></th>
+              <th scope="col" aria-sort="descending"><button type="button" data-key="start_date">Start date</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="end_date">End date</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="credit_amount">Credit amount</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="currency">Currency</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="usage_status">Usage status</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="error">Error</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <noscript>
+        <p class="note">JavaScript is required to render and explore the usage ledger.</p>
+      </noscript>
+    </section>
+
+    <footer class="footer">
+      <span>ICA / analysis usage telemetry</span>
+      <span>Standalone offline artifact</span>
+    </footer>
+  </main>
+
+  <script id="usage-data" type="application/json">[{"project_id": "DEMO-PROJECT", "analysis_reference": "DEMO-REFERENCE-001", "user_reference": "Synthetic Sample 01", "analysis_id": "DEMO-ANALYSIS-001", "analysis_status": "SUCCEEDED", "pipeline": "Synthetic WGS", "start_date": "2026-07-27T01:15:00Z", "end_date": "2026-07-27T03:42:00Z", "credit_amount": 12.75, "currency": "iCredit", "usage_status": "AVAILABLE", "error": ""}, {"project_id": "DEMO-PROJECT", "analysis_reference": "DEMO-REFERENCE-002", "user_reference": "Synthetic Sample 02", "analysis_id": "DEMO-ANALYSIS-002", "analysis_status": "SUCCEEDED", "pipeline": "Synthetic RNA", "start_date": "2026-07-27T05:10:00Z", "end_date": "2026-07-27T09:33:00Z", "credit_amount": 28.5, "currency": "iCredit", "usage_status": "AVAILABLE", "error": ""}, {"project_id": "DEMO-PROJECT", "analysis_reference": "DEMO-REFERENCE-003", "user_reference": "Synthetic Sample 03", "analysis_id": "DEMO-ANALYSIS-003", "analysis_status": "FAILED", "pipeline": "Synthetic WGS", "start_date": "2026-07-28T00:40:00Z", "end_date": "2026-07-28T01:18:00Z", "credit_amount": 7.25, "currency": "iCredit", "usage_status": "AVAILABLE", "error": ""}, {"project_id": "DEMO-PROJECT", "analysis_reference": "DEMO-REFERENCE-004", "user_reference": "Synthetic Sample 04", "analysis_id": "DEMO-ANALYSIS-004", "analysis_status": "RUNNING", "pipeline": "Synthetic DRAGEN", "start_date": "2026-07-28T11:05:00Z", "end_date": "", "credit_amount": null, "currency": "iCredit", "usage_status": "NOT_READY", "error": ""}, {"project_id": "DEMO-PROJECT", "analysis_reference": "DEMO-REFERENCE-005", "user_reference": "Synthetic Sample 05", "analysis_id": "DEMO-ANALYSIS-005", "analysis_status": "SUCCEEDED", "pipeline": "Synthetic Enrichment", "start_date": "2026-07-28T13:20:00Z", "end_date": "2026-07-28T16:55:00Z", "credit_amount": null, "currency": "iCredit", "usage_status": "PROCESSING", "error": ""}]</script>
+  <script>
+    (() => {
+      "use strict";
+
+      const rows = JSON.parse(
+        document.getElementById("usage-data").textContent
+      );
+      const columns = [
+        "analysis_reference",
+        "user_reference",
+        "analysis_id",
+        "analysis_status",
+        "pipeline",
+        "start_date",
+        "end_date",
+        "credit_amount",
+        "currency",
+        "usage_status",
+        "error"
+      ];
+      const statusColumns = new Set([
+        "analysis_status",
+        "usage_status"
+      ]);
+      const numberFormat = new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: 8
+      });
+      const collator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: "base"
+      });
+      const tableBody = document.querySelector("#usage-table tbody");
+      const search = document.getElementById("usage-search");
+      const rowCount = document.getElementById("row-count");
+      let sortKey = "start_date";
+      let sortDirection = -1;
+
+      function displayValue(value, key) {
+        if (value === null || value === undefined || value === "") {
+          return "—";
+        }
+        if (key === "credit_amount" && typeof value === "number") {
+          return numberFormat.format(value);
+        }
+        return String(value);
+      }
+
+      function filteredRows() {
+        const query = search.value.trim().toLocaleLowerCase();
+        const visible = query
+          ? rows.filter((row) =>
+              columns.some((key) =>
+                displayValue(row[key], key)
+                  .toLocaleLowerCase()
+                  .includes(query)
+              )
+            )
+          : [...rows];
+        visible.sort((left, right) => {
+          const a = left[sortKey];
+          const b = right[sortKey];
+          if (a === null || a === undefined) {
+            return b === null || b === undefined ? 0 : 1;
+          }
+          if (b === null || b === undefined) {
+            return -1;
+          }
+          const order =
+            typeof a === "number" && typeof b === "number"
+              ? a - b
+              : collator.compare(String(a), String(b));
+          return order * sortDirection;
+        });
+        return visible;
+      }
+
+      function renderTable() {
+        const visible = filteredRows();
+        const fragment = document.createDocumentFragment();
+        visible.forEach((row) => {
+          const tableRow = document.createElement("tr");
+          columns.forEach((key) => {
+            const cell = document.createElement("td");
+            cell.dataset.column = key;
+            const value = displayValue(row[key], key);
+            cell.title = value === "—" ? "" : value;
+            if (statusColumns.has(key)) {
+              const status = document.createElement("span");
+              const token = String(row[key] || "unknown")
+                .toLocaleLowerCase()
+                .replace(/[^a-z0-9]+/g, "-");
+              status.className = `status-pill status-${token}`;
+              status.textContent = value;
+              cell.append(status);
+            } else {
+              cell.textContent = value;
+            }
+            tableRow.append(cell);
+          });
+          fragment.append(tableRow);
+        });
+        tableBody.replaceChildren(fragment);
+        rowCount.value = `${visible.length} of ${rows.length} records`;
+        rowCount.textContent = rowCount.value;
+      }
+
+      function renderChart() {
+        const chart = document.getElementById("usage-chart");
+        const available = rows.filter(
+          (row) =>
+            typeof row.credit_amount === "number" &&
+            Number.isFinite(row.credit_amount)
+        );
+        if (!available.length) {
+          const empty = document.createElement("li");
+          empty.className = "empty-state";
+          empty.textContent = "No numeric usage values available.";
+          chart.replaceChildren(empty);
+          return;
+        }
+        const groupedByCurrency = new Map();
+        available.forEach((row) => {
+          const currency = row.currency || "Unspecified currency";
+          const currencyRows = groupedByCurrency.get(currency) || [];
+          currencyRows.push(row);
+          groupedByCurrency.set(currency, currencyRows);
+        });
+        const fragment = document.createDocumentFragment();
+        [...groupedByCurrency.entries()]
+          .sort(([left], [right]) => collator.compare(left, right))
+          .forEach(([currency, currencyRows]) => {
+            const maximum = Math.max(
+              ...currencyRows.map(
+                (row) => Math.abs(row.credit_amount)
+              )
+            );
+            const group = document.createElement("li");
+            group.className = "chart-group";
+            const heading = document.createElement("div");
+            heading.className = "chart-group__heading";
+            const currencyLabel = document.createElement("strong");
+            currencyLabel.className = "chart-group__currency";
+            currencyLabel.textContent = currency;
+            const scaleLabel = document.createElement("span");
+            scaleLabel.className = "chart-group__scale";
+            scaleLabel.textContent =
+              `${numberFormat.format(maximum)} ${currency} max`;
+            heading.append(currencyLabel, scaleLabel);
+
+            const groupRows = document.createElement("ol");
+            groupRows.className = "chart-group__rows";
+            currencyRows
+              .sort((a, b) => b.credit_amount - a.credit_amount)
+              .forEach((row) => {
+                const item = document.createElement("li");
+                item.className = "chart-row";
+                const label = document.createElement("span");
+                label.className = "chart-label";
+                label.textContent =
+                  row.analysis_reference ||
+                  row.analysis_id ||
+                  "Unnamed analysis";
+                label.title = label.textContent;
+                const track = document.createElement("span");
+                track.className = "bar-track";
+                const bar = document.createElement("span");
+                bar.className = "bar";
+                bar.style.width =
+                  `${maximum === 0
+                    ? 0
+                    : Math.abs(row.credit_amount) / maximum * 100
+                  }%`;
+                track.append(bar);
+                const value = document.createElement("span");
+                value.className = "chart-value";
+                value.textContent =
+                  `${numberFormat.format(row.credit_amount)} ${currency}`;
+                item.setAttribute(
+                  "aria-label",
+                  `${label.textContent}: ${value.textContent}`
+                );
+                item.append(label, track, value);
+                groupRows.append(item);
+              });
+            group.append(heading, groupRows);
+            fragment.append(group);
+          });
+        chart.replaceChildren(fragment);
+      }
+
+      search.addEventListener("input", renderTable);
+      document.querySelectorAll("th button[data-key]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const nextKey = button.dataset.key;
+          sortDirection = sortKey === nextKey ? sortDirection * -1 : 1;
+          sortKey = nextKey;
+          document.querySelectorAll("th[aria-sort]").forEach((header) => {
+            header.setAttribute("aria-sort", "none");
+          });
+          button.closest("th").setAttribute(
+            "aria-sort",
+            sortDirection === 1 ? "ascending" : "descending"
+          );
+          renderTable();
+        });
+      });
+
+      renderChart();
+      renderTable();
+    })();
+  </script>
+</body>
+</html>
