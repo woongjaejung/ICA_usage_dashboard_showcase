@@ -6,11 +6,11 @@
 
 ## Live demo
 
-[Open the synthetic ICA Usage Dashboard](https://wf4006hufman.github.io/ICA_usage_dashboard_showcase/)
+[Open the synthetic ICA Usage Dashboard](https://woongjaejung.github.io/ICA_usage_dashboard_showcase/)
 
 ## Dashboard preview
 
-[![Synthetic ICA Usage Dashboard preview](assets/dashboard-preview.png)](https://wf4006hufman.github.io/ICA_usage_dashboard_showcase/)
+[![Synthetic ICA Usage Dashboard preview](assets/dashboard-preview.png)](https://woongjaejung.github.io/ICA_usage_dashboard_showcase/)
 
 Select the preview to open the interactive dashboard.
 
